@@ -43,7 +43,7 @@ void Player::Update()
 
 	worldtransform_.matWorld_ = MakeAffineMatrix(
 	    worldtransform_.scale_, worldtransform_.rotation_, worldtransform_.translation_);
-	
+	worldtransform_.TransferMatrix();
 }
 void Player::Draw(ViewProjection viewProjection_) 
 { 
