@@ -1,117 +1,51 @@
-#include "GameScene.h"
-#include "TextureManager.h"
-#include <cassert>
-#include "ImGuiManager.h"
-#include "PrimitiveDrawer.h"
-#include "AxisIndicator.h"
+#pragma once
 
-GameScene::GameScene() {}
+#include "Audio.h"
+#include "DirectXCommon.h"
+#include "Input.h"
+#include "Model.h"
+#include "SafeDelete.h"
+#include "Sprite.h"
+#include "ViewProjection.h"
+#include "WorldTransform.h"
 
-GameScene::~GameScene() 
-{
-	delete sprite_;
-	delete model_;
-	delete debugCamera_;
-}
+/// <summary>
+/// ゲームシーン
+/// </summary>
+class GameScene {
 
-void GameScene::Initialize() {
-
-	dxCommon_ = DirectXCommon::GetInstance();
-	input_ = Input::GetInstance();
-	audio_ = Audio::GetInstance();
-	debugText_ = DebugText::GetInstance();
-	textureHandle_ = TextureManager::Load("sample.png");
-	sprite_ = Sprite::Create(textureHandle_, {100, 50});
-	model_ = Model::Create();
-	worldTransform_.Initialize();
-	viewProjection_.Initialize();
-	//soundDataHandle_ = audio_->LoadWave("se_sad03.wav");
-	//audio_->PlayWave(soundDataHandle_);
-	//voiceHandle_ = audio_->PlayWave(soundDataHandle_, true);
-	PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
-	debugCamera_ = new DebugCamera(WinApp::kWindowWidth,WinApp::kWindowHeight);
-	AxisIndicator::GetInstance()->SetVisible(true);
-	AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
-}
-
-void GameScene::Update() 
-{
-	Vector2 position = sprite_->GetPosition();
-	position.x += 2.0f;
-	position.y += 1.0f;
-
-	sprite_->SetPosition(position);
-	/*if (input_->TriggerKey(DIK_SPACE)) {
-		audio_->StopWave(voiceHandle_);
-	}*/
-	ImGui::Begin("Debug1");
-	ImGui::InputFloat3("InputFloat3", inputFloat3);
-	ImGui::SliderFloat3("SliderFloat3", inputFloat3, 0.0f, 1.0f);
-	ImGui::ShowDemoWindow();
-	ImGui::End();
-	//PrimitiveDrawer::GetInstance()->DrawLine3d({0, 0, 0}, {0, 10, 0}, {1.0f, 0.0f, 0.0f, 1.0f});
-	debugCamera_->Update();
-
-}
-
-void GameScene::Draw() {
-
-	// コマンドリストの取得
-	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
-
-#pragma region 背景スプライト描画
-	// 背景スプライト描画前処理
-	Sprite::PreDraw(commandList);
+public: // メンバ関数
+	/// <summary>
+	/// コンストクラタ
+	/// </summary>
+	GameScene();
 
 	/// <summary>
-	/// ここに背景スプライトの描画処理を追加できる
+	/// デストラクタ
 	/// </summary>
-	/// 
-	
-	//sprite_->Draw();
-	PrimitiveDrawer::GetInstance()->DrawLine3d({0, 0, 0}, {0, 10, 0}, {1.0f, 0.0f, 0.0f, 1.0f});
-
-	// スプライト描画後処理
-	Sprite::PostDraw();
-	// 深度バッファクリア
-	dxCommon_->ClearDepthBuffer();
-#pragma endregion
-
-#pragma region 3Dオブジェクト描画
-	// 3Dオブジェクト描画前処理
-	Model::PreDraw(commandList);
+	~GameScene();
 
 	/// <summary>
-	/// ここに3Dオブジェクトの描画処理を追加できる
+	/// 初期化
 	/// </summary>
-	
-	// 3Dモデル描画
-	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
-	
-	
-
-	// デバックカメラ
-	model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), textureHandle_);
-
-	// 3Dオブジェクト描画後処理
-	Model::PostDraw();
-
-
-#pragma endregion
-
-#pragma region 前景スプライト描画
-	// 前景スプライト描画前処理
-	Sprite::PreDraw(commandList);
+	void Initialize();
 
 	/// <summary>
-	/// ここに前景スプライトの描画処理を追加できる
+	/// 毎フレーム処理
 	/// </summary>
+	void Update();
 
+	/// <summary>
+	/// 描画
+	/// </summary>
+	void Draw();
 
+private: // メンバ変数
+	DirectXCommon* dxCommon_ = nullptr;
+	Input* input_ = nullptr;
+	Audio* audio_ = nullptr;
 
-
-	// スプライト描画後処理
-	Sprite::PostDraw();
-
-#pragma endregion
-}
+	/// <summary>
+	/// ゲームシーン用
+	/// </summary>
+};

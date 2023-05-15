@@ -1,68 +1,61 @@
-#pragma once
+#include "GameScene.h"
+#include "TextureManager.h"
+#include <cassert>
 
-#include "Audio.h"
-#include "DirectXCommon.h"
-#include "DebugText.h"
-#include "Input.h"
-#include "Model.h"
-#include "SafeDelete.h"
-#include "Sprite.h"
-#include "ViewProjection.h"
-#include "WorldTransform.h"
-#include "DebugCamera.h"
+GameScene::GameScene() {}
 
-/// <summary>
-/// ゲームシーン
-/// </summary>
-class GameScene {
+GameScene::~GameScene() {}
 
-public: // メンバ関数
-	/// <summary>
-	/// コンストクラタ
-	/// </summary>
-	GameScene();
+void GameScene::Initialize() {
 
-	/// <summary>
-	/// デストラクタ
-	/// </summary>
-	~GameScene();
+	dxCommon_ = DirectXCommon::GetInstance();
+	input_ = Input::GetInstance();
+	audio_ = Audio::GetInstance();
+}
+
+void GameScene::Update() {}
+
+void GameScene::Draw() {
+
+	// コマンドリストの取得
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+
+#pragma region 背景スプライト描画
+	// 背景スプライト描画前処理
+	Sprite::PreDraw(commandList);
 
 	/// <summary>
-	/// 初期化
+	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
-	void Initialize();
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
+	// 深度バッファクリア
+	dxCommon_->ClearDepthBuffer();
+#pragma endregion
+
+#pragma region 3Dオブジェクト描画
+	// 3Dオブジェクト描画前処理
+	Model::PreDraw(commandList);
 
 	/// <summary>
-	/// 毎フレーム処理
+	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	void Update();
+
+	// 3Dオブジェクト描画後処理
+	Model::PostDraw();
+#pragma endregion
+
+#pragma region 前景スプライト描画
+	// 前景スプライト描画前処理
+	Sprite::PreDraw(commandList);
 
 	/// <summary>
-	/// 描画
+	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	void Draw();
 
-private: // メンバ変数
-	DirectXCommon* dxCommon_ = nullptr;
-	Input* input_ = nullptr;
-	Audio* audio_ = nullptr;
-	DebugText* debugText_ = nullptr;
-	uint32_t textureHandle_ = 0;
-	Sprite* sprite_ = nullptr;
-	Model* model_ = nullptr;
-	uint32_t soundDataHandle_ = 0;
-	uint32_t voiceHandle_ = 0;
-	float inputFloat3[3] = {0, 0, 0};
-	DebugCamera* debugCamera_ = nullptr;
+	// スプライト描画後処理
+	Sprite::PostDraw();
 
-	/// <summary>
-	/// ゲームシーン用
-	/// </summary>
-	
-	/// ワールド・ビュープロジェクション
-	WorldTransform worldTransform_;
-	ViewProjection viewProjection_;
-
-
-
-};
+#pragma endregion
+}
