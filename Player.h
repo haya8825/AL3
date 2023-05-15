@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include"Input.h"
 class Player 
 {
 	public:
@@ -23,6 +24,6 @@ class Player
 
 			uint32_t textureHandle_ = 0u;
 
-
+			Input* input_ = nullptr;
 
 };
