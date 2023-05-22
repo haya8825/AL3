@@ -1,6 +1,6 @@
 #include"Player.h"
 #include <cassert>
-
+#include"ImGuiManager.h"
 
 void Player::Initialize(Model* model, uint32_t textureHandle) 
 { 
@@ -26,17 +26,24 @@ void Player::Update()
 	{
 		move.x += kCharacterSpeed;
 	}
-	if (input_->PushKey(DIK_UP)) {
-		move.y -= kCharacterSpeed;
+	 else if (input_->PushKey(DIK_UP)) {
+		move.y += kCharacterSpeed;
 
 	} else if (input_->PushKey(DIK_DOWN)) {
-		move.y += kCharacterSpeed;
+		move.y -= kCharacterSpeed;
 	}
-	worldtransform_.scale_;
+	
+	const float kMoveLimitX = 30.0f;
+	const float kMoveLimitY = 18.0f;
+	
+	worldtransform_.translation_.x = max(worldtransform_.translation_.x, -kMoveLimitX);
+	worldtransform_.translation_.x = min(worldtransform_.translation_.x, +kMoveLimitX);
+	worldtransform_.translation_.y = max(worldtransform_.translation_.y, -kMoveLimitY);
+	worldtransform_.translation_.y = min(worldtransform_.translation_.y, +kMoveLimitY);
 
-	worldtransform_.rotation_.x *= kCharacterSpeed ;
-	worldtransform_.rotation_.y *= kCharacterSpeed ;
-	worldtransform_.rotation_.z *= kCharacterSpeed ;
+	worldtransform_.translation_.x += move.x;
+	worldtransform_.translation_.y += move.y;
+	worldtransform_.translation_.z += move.z;
 
 
 
@@ -44,6 +51,15 @@ void Player::Update()
 	worldtransform_.matWorld_ = MakeAffineMatrix(
 	    worldtransform_.scale_, worldtransform_.rotation_, worldtransform_.translation_);
 	worldtransform_.TransferMatrix();
+
+	// ImGui
+	ImGui::Begin("player");
+	float sliderValue[3] = {
+	    worldtransform_.translation_.x, worldtransform_.translation_.y, worldtransform_.translation_.z};
+	ImGui::SliderFloat3("position", sliderValue, 20.0f, 20.0f);
+	worldtransform_.translation_ = {sliderValue[0], sliderValue[1], sliderValue[2]};
+	ImGui::End();
+
 }
 void Player::Draw(ViewProjection viewProjection_) 
 { 
