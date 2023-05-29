@@ -4,10 +4,12 @@
 #include "WorldTransform.h"
 #include"Input.h"
 #include"PlayerBullet.h"
+#include<list>
 class Player 
 {
 	public:
-		
+		 Player();
+	   ~Player();
 
 		void Initialize(Model* model, uint32_t textureHandle);
 
@@ -17,6 +19,8 @@ class Player
 		void Draw(ViewProjection viewProjection_);
 
 		void Attack();
+	   
+	 std::list<PlayerBullet*> bullets_;
 
 		private:
 
