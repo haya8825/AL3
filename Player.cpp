@@ -21,31 +21,27 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 	input_ = Input::GetInstance();
 }
 
-void Player::Update() 
-{ 
+void Player::Update() {
 	worldtransform_.TransferMatrix();
-	Vector3 move = {0,0,0};
+	Vector3 move = {0, 0, 0};
 
 	const float kCharacterSpeed = 0.2f;
 
-	if (input_->PushKey(DIK_LEFT)) 
-	{
+	if (input_->PushKey(DIK_LEFT)) {
 		move.x -= kCharacterSpeed;
 
-	} else if (input_->PushKey(DIK_RIGHT))
-	{
+	} else if (input_->PushKey(DIK_RIGHT)) {
 		move.x += kCharacterSpeed;
-	}
-	 else if (input_->PushKey(DIK_UP)) {
+	} else if (input_->PushKey(DIK_UP)) {
 		move.y += kCharacterSpeed;
 
 	} else if (input_->PushKey(DIK_DOWN)) {
 		move.y -= kCharacterSpeed;
 	}
-	
+
 	const float kMoveLimitX = 30.0f;
 	const float kMoveLimitY = 18.0f;
-	
+
 	worldtransform_.translation_.x = max(worldtransform_.translation_.x, -kMoveLimitX);
 	worldtransform_.translation_.x = min(worldtransform_.translation_.x, +kMoveLimitX);
 	worldtransform_.translation_.y = max(worldtransform_.translation_.y, -kMoveLimitY);
@@ -55,9 +51,6 @@ void Player::Update()
 	worldtransform_.translation_.y += move.y;
 	worldtransform_.translation_.z += move.z;
 
-
-
-
 	worldtransform_.matWorld_ = MakeAffineMatrix(
 	    worldtransform_.scale_, worldtransform_.rotation_, worldtransform_.translation_);
 	worldtransform_.TransferMatrix();
@@ -65,7 +58,8 @@ void Player::Update()
 	// ImGui
 	ImGui::Begin("player");
 	float sliderValue[3] = {
-	    worldtransform_.translation_.x, worldtransform_.translation_.y, worldtransform_.translation_.z};
+	    worldtransform_.translation_.x, worldtransform_.translation_.y,
+	    worldtransform_.translation_.z};
 	ImGui::SliderFloat3("position", sliderValue, 20.0f, 20.0f);
 	worldtransform_.translation_ = {sliderValue[0], sliderValue[1], sliderValue[2]};
 	ImGui::End();
@@ -83,9 +77,15 @@ void Player::Update()
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Update();
 	}
-
+	bullets_.remove_if([](PlayerBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
 }
-void Player::Draw(ViewProjection viewProjection_) 
+	void Player::Draw(ViewProjection viewProjection_) 
 { 
 	model_->Draw(worldtransform_,viewProjection_,textureHandle_); 
 
@@ -95,11 +95,16 @@ void Player::Draw(ViewProjection viewProjection_)
 }
 void Player::Attack() {
 
-if (input_->PushKey(DIK_SPACE)) {
+if (input_->TriggerKey(DIK_SPACE)) {
+
+		const float kBulletSpeed = 1.0f;
+		Vector3 velocity(0,0,kBulletSpeed);
+
+		velocity = TransformNormal(velocity,worldtransform_.matWorld_ );
 
 		PlayerBullet* newBullet = new PlayerBullet();
 
-		newBullet->Initialize(model_, worldtransform_.translation_);
+		newBullet->Initialize(model_, worldtransform_.translation_,velocity);
 
 		bullets_.push_back(newBullet);
 	
