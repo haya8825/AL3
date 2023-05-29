@@ -60,9 +60,40 @@ void Player::Update()
 	worldtransform_.translation_ = {sliderValue[0], sliderValue[1], sliderValue[2]};
 	ImGui::End();
 
+	const float kRotSpeed = 0.02f;
+
+	if (input_->PushKey(DIK_A)) {
+		worldtransform_.rotation_.y -= kRotSpeed;
+
+	} else if (input_->PushKey(DIK_D)) {
+		worldtransform_.rotation_.y += kRotSpeed;
+	}
+	Attack();
+
+	if (bullet_) {
+		bullet_->Update();
+	};
+
 }
 void Player::Draw(ViewProjection viewProjection_) 
 { 
 	model_->Draw(worldtransform_,viewProjection_,textureHandle_); 
+
+	if (bullet_) {
+		bullet_->Draw(viewProjection_);
+	}
+
+}
+void Player::Attack() {
+
+if (input_->PushKey(DIK_SPACE)) 
+	{
+		PlayerBullet* newBullet = new PlayerBullet();
+
+		newBullet->Initialize(model_,worldtransform_.translation_);
+
+		bullet_ = newBullet;
+
+	}
 
 }

@@ -3,6 +3,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include"Input.h"
+#include"PlayerBullet.h"
 class Player 
 {
 	public:
@@ -15,6 +16,7 @@ class Player
 
 		void Draw(ViewProjection viewProjection_);
 
+		void Attack();
 
 		private:
 
@@ -25,5 +27,7 @@ class Player
 			uint32_t textureHandle_ = 0u;
 
 			Input* input_ = nullptr;
+
+			PlayerBullet* bullet_ = nullptr;
 
 };
