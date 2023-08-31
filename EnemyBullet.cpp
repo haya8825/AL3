@@ -1,7 +1,8 @@
-﻿#include "PlayerBullet.h"
+﻿#include "EnemyBullet.h"
 #include <cassert>
 
-void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vector3& Velocity) { 
+void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector3& Velocity) 
+{
 	assert(model);
 
 	model_ = model;
@@ -9,7 +10,7 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 	velocity_ = Velocity;
 
 	// テクスチャ読み込み
-	textureHandle_ = TextureManager::Load("cube/cube.jpg");
+	textureHandle_ = TextureManager::Load("EnemyMobBox.png");
 
 	worldTransform_.Initialize();
 
@@ -17,34 +18,30 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 	worldTransform_.translation_ = position;
 }
 
-void PlayerBullet::Update()
+void EnemyBullet::Update() 
 {
 
 	worldTransform_.translation_.x += velocity_.x;
 	worldTransform_.translation_.y += velocity_.y;
 	worldTransform_.translation_.z += velocity_.z;
 
-	if (--deathTimer_ <= 0) {
+	// 弾の消失判定
+	if (--deathTimer_ <= 0)
+	{
 		isDead_ = true;
 	}
 
 	worldTransform_.UpdateMatrix();
-
 }
 
-void PlayerBullet::Draw(const ViewProjection& viewProjection) 
+void EnemyBullet::Draw(const ViewProjection& viewProjection) 
 {
-
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-
+	
 }
 
-void PlayerBullet::OnCollision() 
-{
-	isDead_ = true; 
-}
 
-Vector3 PlayerBullet::GetWorldPosition() {
+Vector3 EnemyBullet::GetWorldPosition() {
 
 	Vector3 worldPos;
 
@@ -53,4 +50,11 @@ Vector3 PlayerBullet::GetWorldPosition() {
 	worldPos.z = worldTransform_.translation_.z;
 
 	return worldPos;
+}
+
+
+void EnemyBullet::OnCollision() 
+{
+	isDead_ = true; 
+	dethPoint_ += 1;
 }

@@ -2,36 +2,93 @@
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include"Input.h"
-#include"PlayerBullet.h"
-#include<list>
+#include "Input.h"
+#include "ImGuiManager.h"
+#include "Matrix4x4.h"
+#include "PlayerBullet.h"
+#include "MathUtility.h"
+#include "Sprite.h"
+#include <list>
+
+
+/// <summary>
+/// 自キャラ
+/// </summary>
 class Player 
 {
-	public:
-		 Player();
-	   ~Player();
+public:
+	/// <summary>
+	///	初期化
+	/// </summary>
+	///  <param name="model">モデル</param>
+	///  <param name="textureHandle">テクスチャハンドル</param>
+	void Initialize(Model* model, uint32_t textureHandle, Vector3 playerPosition);
 
-		void Initialize(Model* model, uint32_t textureHandle);
+	/// <summary>
+	///	更新
+	/// </summary>
+	void Update(ViewProjection &viewProjection);
+	
+	/// /// <summary>
+	///	描画
+	/// </summary>
+	void Draw(ViewProjection &viewProjection);
 
-		void Update();
+	void Rotate();
+
+	void Attack();
+
+	// Getter
+	Vector3 GetWorldPosition();
+
+	const float radius_ = 1.0f;
+
+	const float GetRadius() { return radius_; }
+
+	// 弾リストを取得
+	const std::list<PlayerBullet*>& GetBullet() { return bullets_; }
+
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Player();
+
+	// 衝突を検知したら呼び出されるコールバック関数
+	void OnCollision();
+
+	/// <summary>
+	/// 親となるワールドトランスフォームをセット
+	/// </summary>
+	/// <param name="parent">親となるワールドトランスフォーム</param>
+	void SetParent(const WorldTransform* parent);
 
 
-		void Draw(ViewProjection viewProjection_);
+	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
 
-		void Attack();
-	   
-	 std::list<PlayerBullet*> bullets_;
+private:
+	// ワールド変換データ
+	WorldTransform worldTransform_;
+	// モデル
+	Model* model_ = nullptr;
+	// テクスチャハンドル
+	uint32_t textureHandle_ = 0u;
 
-		private:
+	//キーボード入力
+	Input* input_ = nullptr;
 
-			WorldTransform worldtransform_;
+	std::list<PlayerBullet*> bullets_;// 弾のリスト
 
-			Model* model_ = nullptr;
+	// 初期位置
+	Vector3 playerPosition_{};
 
-			uint32_t textureHandle_ = 0u;
+	WorldTransform worldTransform3DReticle_;
 
-			Input* input_ = nullptr;
+	Sprite* sprite2DReticle_ = nullptr;
 
-			PlayerBullet* bullet_ = nullptr;
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
 
 };

@@ -5,9 +5,9 @@
 #include "WorldTransform.h"
 
 /// <summary>
-/// 自キャラの弾
+/// 敵の弾
 /// </summary>
-class PlayerBullet {
+class EnemyBullet {
 
 public:
 	/// <summary>
@@ -29,11 +29,14 @@ public:
 	/// <param name="viewProjection"></param>
 	void Draw(const ViewProjection& viewProjection);
 
+	/// <summary>
+	/// 弾の消失
+	/// </summary>
+	/// <returns></returns>
 	bool IsDead() const { return isDead_; }
 
 	// Getter
 	Vector3 GetWorldPosition();
-
 
 	// 衝突を検知したら呼び出されるコールバック関数
 	void OnCollision();
@@ -47,12 +50,14 @@ private:
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+
 	// モデル
 	Model* model_ = nullptr;
+
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
-	//速度
+	// 速度
 	Vector3 velocity_;
 
 	// 寿命
@@ -64,4 +69,5 @@ private:
 	// デスフラグ
 	bool isDead_ = false;
 
+	int dethPoint_ = 0;
 };

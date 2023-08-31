@@ -3,13 +3,26 @@
 #include "Vector3.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "MathUtility.h"
+#include <list>
+#include "EnemyBullet.h"
+
+enum class Phase {
+	Approach, // 接近する
+	Leave,    // 離脱する
+};
+
+class Player;
+
+class GameScene;
 
 /// <summary>
-/// 自キャラの弾
+/// 敵
 /// </summary>
-class PlayerBullet {
+class Enemy {
 
 public:
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -17,6 +30,10 @@ public:
 	/// <param name="position"></param>
 	/// <param name="Velocity"></param>
 	void Initialize(Model* model, const Vector3& position, const Vector3& Velocity);
+
+
+	void SetPlayer(Player* player) { player_ = player; }
+
 
 	/// <summary>
 	/// 更新
@@ -29,11 +46,32 @@ public:
 	/// <param name="viewProjection"></param>
 	void Draw(const ViewProjection& viewProjection);
 
-	bool IsDead() const { return isDead_; }
+	
+
+	// 接近関数
+	void EnemyApproach();
+
+	// 離脱関数
+	void EnemyLeave();
+
+	/// <summary>
+	/// 弾発射
+	/// </summary>
+	void Fire();
 
 	// Getter
 	Vector3 GetWorldPosition();
 
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Enemy();
+
+	// 発射間隔
+	static const int kFireInterval = 30;
+
+	// 接近フェーズ初期化
+	void ApproachInitialize();
 
 	// 衝突を検知したら呼び出されるコールバック関数
 	void OnCollision();
@@ -42,26 +80,34 @@ public:
 
 	const float GetRadius() { return radius_; }
 
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 private:
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+
 	// モデル
 	Model* model_ = nullptr;
+
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
-	//速度
+	// 速度
 	Vector3 velocity_;
 
-	// 寿命
-	static const int32_t kLifeTime = 60 * 5;
+	// フェーズ
+	Phase phase_ = Phase::Approach;
 
-	// デスタイマー
-	int32_t deathTimer_ = kLifeTime;
+		// 弾のリスト
+	std::list<EnemyBullet*> bullets_;
 
-	// デスフラグ
-	bool isDead_ = false;
+	// 発射タイマー
+	int32_t fireTimer_;
 
+	Player* player_ = nullptr;
+
+	GameScene* gameScene_ = nullptr;
+
+	
 };
